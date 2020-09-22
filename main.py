@@ -5,6 +5,7 @@ from bitstring import BitArray
 from pydub.utils import audioop
 import time
 import functools
+import wave
 
 
 class Translator:
@@ -25,16 +26,26 @@ class Translator:
 
 
 if __name__ == '__main__':
-    starting_freq = 500
-    translator = Translator(starting_freq, 1000, 8)
-    for translation in translator.translate(b'\xFF\x7F\x3F\x1F\x07\x03\x01'):
+
+    
+    start_signal = b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF'
+    signal = b'\xFF\x7F\x3F\x1F\x07\x03\x01'
+    starting_freq = 18500
+    saltos = 200
+    pulse_duration = 100
+    silence_duration = 100
+    silence = AudioSegment.silent(silence_duration)
+    translator = Translator(starting_freq, saltos, 8)
+    melody = [silence]
+    for translation in translator.translate(start_signal):
         tones = []
         for freq, bit in translation.items():
             if not bit:
                 continue
-            tones.append(Sine(freq).to_audio_segment(duration=1000, volume=-15))
-        if len(tones) == 0:
-            time.sleep(1)
-        else:
-            play(functools.reduce(lambda a, b: b*a, tones))
+            print(freq)
+            tones.append(Sine(freq).to_audio_segment(duration=pulse_duration, volume=-20))
+        sound = functools.reduce(lambda a, b: b*a, tones)
+        melody.append(sound+silence)
+    print(tones)
+    play(functools.reduce(lambda a, b: a+b, melody))#*suma frecuencias sobrecaca rara
 
