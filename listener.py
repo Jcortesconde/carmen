@@ -1,7 +1,6 @@
 import pyaudio
 import wave
 from scipy.io import wavfile
-import scipy as sp
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -56,7 +55,6 @@ class Frequency:
     def filter_intervals(self, tone_time, threshold):
 
         self.intervals = list(filter(lambda tup: abs(tone_time - (tup[1] - tup[0])) < threshold, self.intervals))
-
 
 class Listener:
     def __init__(self, chunk, fmat, channels, rate, starting_freq, bandwitdth, bits):
@@ -165,7 +163,6 @@ class Listener:
         indexes = {freq: int(freq / bucket_size) for freq in self.bands}
         values = [Frequency(freq, Sx[indx_freq], self.start_t, self.delta_t, threshold) for freq, indx_freq in
                   indexes.items()]
-
         return values
 
 
