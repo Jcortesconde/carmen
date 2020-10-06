@@ -32,10 +32,11 @@ if __name__ == '__main__':
     signal = b'\xFF\x7F\x3F\x1F\x07\x03\x01'
     starting_freq = 18500
     saltos = 200
+    cantidad_bits = 8
     pulse_duration = 100
     silence_duration = 100
     silence = AudioSegment.silent(silence_duration)
-    translator = Translator(starting_freq, saltos, 8)
+    translator = Translator(starting_freq, saltos, cantidad_bits)
     melody = [silence]
     for translation in translator.translate(start_signal):
         tones = []
