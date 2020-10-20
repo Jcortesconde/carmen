@@ -145,6 +145,7 @@ class Listener:
         start_interval = None
         end_interval = None
         for freq in frequencies:
+            print(freq.freq, freq.intervals)
             interval = freq.intervals[0]
             if start_interval is None or interval[0] < start_interval[0]:
                 start_interval = interval
@@ -220,6 +221,12 @@ class Listener:
                   indexes.items()]
         return values
 
+    def listen_and_extract(self, duration, filename):
+        frames = self.listen(duration)
+        self.save(frames, filename)
+        info = self.extract_info(filename)
+
+        return info
 
 def plot_amp(audio, rate):
     """
@@ -266,10 +273,11 @@ if __name__ == '__main__':
     listener = Listener(chunk, fmat, channels, rate, starting_freq, jumps, bits, pulse_duration, silence_duration)
     record_seconds = 10
     filename = "output1.wav"
+    filename = 'test_futures1.wav'
     calib_file = "calib.wav"
 
-#    frames = listener.listen(record_seconds)
- #   listener.save(frames, filename)
+    # frames = listener.listen(record_seconds)
+    # listener.save(frames, filename)
 
     rate, audio = wavfile.read(filename)
     M = 1024
@@ -277,7 +285,7 @@ if __name__ == '__main__':
                                          nperseg=1024, noverlap=M - 100,
                                          detrend=False, scaling='spectrum')
 
-  #  plot_spectogram(freqs, times, Sx)
+    plot_spectogram(freqs, times, Sx)
     info = listener.extract_info(filename)
     print(info)
     # time_intervals = listener.find_freq(freqs, times, Sx)

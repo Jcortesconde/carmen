@@ -38,25 +38,37 @@ class Reproducer:
         self.pulse_duration = pulse_duration
         self.silence_duration = silence_duration
 
-    def send_info(self, info, volume=-20):
+    def get_time(self, info):
         """
 
-        :param info: an arrray of bytes to send
-        :param volume: the volume at which to reproduce de sound
-        :return:
+        :param info: message to send
+        :return: the time that the melody will take
         """
+        melody = self.generate_melody(info)
+        return melody.duration_seconds
+
+    def generate_melody(self, info, volume=-20):
         # TODO see to incorporate other sounds in the background to hide the message
-        silence = AudioSegment.silent(silence_duration)
+        silence = AudioSegment.silent(self.silence_duration)
         melody = [silence]
-        for translation in translator.translate(info):
+        for translation in self.translator.translate(info):
             tones = []
             for freq, bit in translation.items():
                 if not bit:
                     continue
                 tones.append(Sine(freq).to_audio_segment(duration=self.pulse_duration, volume=volume))
-            sound = functools.reduce(lambda a, b: b*a, tones)
-            melody.append(sound+silence)
-        play(functools.reduce(lambda a, b: a+b, melody))
+            sound = functools.reduce(lambda a, b: b * a, tones)
+            melody.append(sound + silence)
+        return functools.reduce(lambda a, b: a + b, melody)
+
+    def send_info(self, info, volume=-20):
+        """
+        :param info: an arrray of bytes to send
+        :param volume: the volume at which to reproduce de sound
+        :return:
+        """
+        melody = self.generate_melody(info, volume)
+        play(melody)
 
 
 if __name__ == '__main__':
