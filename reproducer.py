@@ -7,9 +7,10 @@ import argparse
 from protocol import IdentityProtocol
 import time
 
+
 class Translator:
-    def __init__(self, starting_freq, bandwitdth, bits):
-        self.bands = [starting_freq + i * bandwitdth for i in range(bits)]
+    def __init__(self, starting_freq, bandwidth, bits):
+        self.bands = [starting_freq + i * bandwidth for i in range(bits)]
 
     def translate(self, data):
         bits = BitArray(data)
@@ -23,6 +24,7 @@ class Translator:
                     break
             yield freqs
 
+
 class Reproducer:
     def __init__(self, starting_freq, delta_freq, bits, pulse_duration, silence_duration):
         """
@@ -30,8 +32,8 @@ class Reproducer:
         :param starting_freq: The starting frequency where the information is going to be store
         :param delta_freq: space between the frequencies that hold information
         :param bits: amount of information that is going to be send
-        :param pulse_duration: the amount of time in miliseconds that a tone is going to sound
-        :param silence_duration: the time in miliseconds between tones
+        :param pulse_duration: the amount of time in milliseconds that a tone is going to sound
+        :param silence_duration: the time in milliseconds between tones
         """
         self.translator = Translator(starting_freq, delta_freq, bits)
         self.pulse_duration = pulse_duration
@@ -64,7 +66,7 @@ class Reproducer:
 
     def send_info(self, info, volume=-20):
         """
-        :param info: an arrray of bytes to send
+        :param info: an array of bytes to send
         :param volume: the volume at which to reproduce de sound
         :return:
         """
@@ -78,10 +80,10 @@ if __name__ == '__main__':
                         type=int)
     parser.add_argument('jump', help='The distance between two frequencies of information in Hz', type=int)
     parser.add_argument('bits', help='The amount of bits send in a pulse', type=int)
-    parser.add_argument('pulse_duration', help='The amount of time in miliseconds that a tone is going to sound',
+    parser.add_argument('pulse_duration', help='The amount of time in milliseconds that a tone is going to sound',
                         type=int)
-    parser.add_argument('silence_duration', help='The time in miliseconds between tones', type=int)
-    parser.add_argument('information', help='The information to send')#, type=bytes)
+    parser.add_argument('silence_duration', help='The time in milliseconds between tones', type=int)
+    parser.add_argument('information', help='The information to send')  # , type=bytes)
     parser.add_argument('--volume', help='The volume of the signal, default is 20', type=int, default=-20)
 
     args = parser.parse_args()

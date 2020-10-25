@@ -94,7 +94,8 @@ class Listener:
         self.channels = channels
         self.rate = rate
         self.bands = [starting_freq + i * delta_freq for i in range(bits)]  # should always be lower to higher
-        self.pulse_duration = pulse_duration / 1000  # we work with seconds here # TODO work with  same unit of time between all project
+        self.pulse_duration = pulse_duration / 1000  # we work with seconds here
+        # TODO work with  same unit of time between all project
         self.silence_time = silence_time / 1000  # we work with seconds here
         # This will be modified once we start analyzing one audio sample
         self.delta_t = 0
@@ -228,7 +229,7 @@ class Listener:
         return values
 
     def listen_and_extract(self, duration, filename):
-        filename = 'sound_files/'+filename
+        filename = 'sound_files/' + filename
         frames = self.listen(duration)
         self.save(frames, filename)
         info = self.extract_info(filename)
@@ -271,28 +272,33 @@ def plot_spectogram(freqs, times, Sx):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('starting_freq', help='The starting frequency where the information is going to be store', type=int)
+    parser.add_argument('starting_freq', help='The starting frequency where the information is going to be store',
+                        type=int)
     parser.add_argument('jump', help='The distance between two frequencies of information in Hz', type=int)
     parser.add_argument('bits', help='The amount of bits send in a pulse', type=int)
-    parser.add_argument('pulse_duration', help='The amount of time in miliseconds that a tone is going to sound', type=int)
+    parser.add_argument('pulse_duration', help='The amount of time in miliseconds that a tone is going to sound',
+                        type=int)
     parser.add_argument('silence_duration', help='The time in miliseconds between tones', type=int)
     parser.add_argument('seconds', help='The seconds to listen', type=int)
-    parser.add_argument('-c', '--chunk', help='The size of data in a chunk, default is 1024',type=int, default=1024)
-    parser.add_argument('-f', '--format', help='The Format of the audio, default is 16 bits', type=type(pyaudio.paInt16), default=pyaudio.paInt16)
+    parser.add_argument('-c', '--chunk', help='The size of data in a chunk, default is 1024', type=int, default=1024)
+    parser.add_argument('-f', '--format', help='The Format of the audio, default is 16 bits',
+                        type=type(pyaudio.paInt16), default=pyaudio.paInt16)
     parser.add_argument('--channels', help='The amount of channels to listen, default is 1', type=int, default=1)
     parser.add_argument('-r', '--rate', help='The rate of the sampling, default is 44100 hz', type=int, default=44100)
-    parser.add_argument('--filename', help='The name where to save the file, must end with .wav', type=str, default='output.wav')
+    parser.add_argument('--filename', help='The name where to save the file, must end with .wav', type=str,
+                        default='output.wav')
     parser.add_argument('--plot', help='It will plot the spectogram', action='store_true')
 
     args = parser.parse_args()
 
-    listener = Listener(args.chunk, args.format, args.channels, args.rate, args.starting_freq, args.jump, args.bits, args.pulse_duration, args.silence_duration)
+    listener = Listener(args.chunk, args.format, args.channels, args.rate, args.starting_freq, args.jump, args.bits,
+                        args.pulse_duration, args.silence_duration)
     encoded_signal = listener.listen_and_extract(args.seconds, args.filename)
     protocol = protocol.IdentityProtocol()
     info = protocol.decode(encoded_signal)
-    print('listen:',info.hex())
+    print('listen:', info.hex())
     if args.plot:
-        rate, audio = wavfile.read('sound_files/'+ args.filename)
+        rate, audio = wavfile.read('sound_files/' + args.filename)
         M = 1024
         freqs, times, Sx = signal.spectrogram(audio, fs=args.rate, window='hanning',
                                               nperseg=1024, noverlap=M - 100,
