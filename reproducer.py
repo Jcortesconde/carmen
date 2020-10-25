@@ -2,11 +2,10 @@ from pydub.generators import Sine
 from pydub.playback import play
 from pydub import AudioSegment
 from bitstring import BitArray
-from pydub.utils import audioop
-import time
 import functools
-import wave
-
+import argparse
+from protocol import IdentityProtocol
+import time
 
 class Translator:
     def __init__(self, starting_freq, bandwitdth, bits):
@@ -57,7 +56,9 @@ class Reproducer:
                 if not bit:
                     continue
                 tones.append(Sine(freq).to_audio_segment(duration=self.pulse_duration, volume=volume))
-            sound = functools.reduce(lambda a, b: b * a, tones)
+            sound = AudioSegment.silent(self.pulse_duration)
+            if len(tones) != 0:
+                sound = functools.reduce(lambda a, b: b * a, tones)
             melody.append(sound + silence)
         return functools.reduce(lambda a, b: a + b, melody)
 
@@ -72,13 +73,22 @@ class Reproducer:
 
 
 if __name__ == '__main__':
-    start_signal = b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF'
-    signal = b'\xFF\x7F\x3F\x1F\x07\x03\x01'
-    starting_freq = 18500
-    jumps = 200
-    bits = 8
-    pulse_duration = 100
-    silence_duration = 100
+    parser = argparse.ArgumentParser()
+    parser.add_argument('starting_freq', help='The starting frequency where the information is going to be store',
+                        type=int)
+    parser.add_argument('jump', help='The distance between two frequencies of information in Hz', type=int)
+    parser.add_argument('bits', help='The amount of bits send in a pulse', type=int)
+    parser.add_argument('pulse_duration', help='The amount of time in miliseconds that a tone is going to sound',
+                        type=int)
+    parser.add_argument('silence_duration', help='The time in miliseconds between tones', type=int)
+    parser.add_argument('information', help='The information to send')#, type=bytes)
+    parser.add_argument('--volume', help='The volume of the signal, default is 20', type=int, default=-20)
 
-    reproducer = Reproducer(starting_freq, jumps, bits, pulse_duration, silence_duration)
-    reproducer.send_info(signal)
+    args = parser.parse_args()
+    protocol = IdentityProtocol()
+
+    byte_info = bytes.fromhex(args.information)
+    encoded_information = protocol.encode(byte_info)
+    reproducer = Reproducer(args.starting_freq, args.jump, args.bits, args.pulse_duration, args.silence_duration)
+    time.sleep(0.5)
+    reproducer.send_info(encoded_information, args.volume)
