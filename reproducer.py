@@ -92,5 +92,5 @@ if __name__ == '__main__':
     byte_info = bytes.fromhex(args.information)
     encoded_information = protocol.encode(byte_info)
     reproducer = Reproducer(args.starting_freq, args.jump, args.bits, args.pulse_duration, args.silence_duration)
-    time.sleep(0.5)
+    time.sleep(0.7)
     reproducer.send_info(encoded_information, args.volume)
