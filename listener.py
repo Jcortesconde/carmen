@@ -229,6 +229,7 @@ class Listener:
         # TODO if we calibrate given a known sound we should be able to use better estimators, maybe needed
         bucket_size = freqs[1] - freqs[0]
         self.delta_t = times_bucket[1] - times_bucket[0]
+        #print(bucket_size, self.delta_t)
         self.start_t = times_bucket[0]
         self.amount_t = len(times_bucket)
         indexes = {freq: int(freq / bucket_size) for freq in self.bands}

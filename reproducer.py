@@ -51,7 +51,7 @@ class Reproducer:
     def generate_melody(self, info, volume=-20):
         # TODO see to incorporate other sounds in the background to hide the message
         silence = AudioSegment.silent(self.silence_duration)
-        melody = [silence]
+        melody = []
         for translation in self.translator.translate(info):
             tones = []
             for freq, bit in translation.items():
